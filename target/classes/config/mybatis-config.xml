@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+	<settings>
+		<!-- changes from the defaults -->
+		<setting name="lazyLoadingEnabled" value="false" />
+		<setting name="cacheEnabled" value="true" />
+		<setting name="callSettersOnNulls" value="false" />
+		<setting name="logImpl" value="LOG4J" />
+	</settings>
+ 
+	<typeAliases>
+		<typeAlias type="com.pchen.entity.User" alias="user" />
+		<typeAlias type="com.pchen.entity.Pic" alias="pic" />
+		<typeAlias type="com.pchen.util.Params" alias="params" />
+	</typeAliases>
+</configuration>

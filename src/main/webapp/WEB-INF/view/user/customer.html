@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<title>客户界面</title>
+<style type="text/css">
+.file {
+	/*  opacity: 0;  
+			z-index: 1; 
+			filter: alpha(opacity=0); */
+	position: relative;
+	display: inline-block;
+	float: center;
+	border-radius: 4px;
+	overflow: hidden;
+	color: #455a64;
+	font-size: 13px;
+	text-decoration: none;
+	text-indent: 0;
+	line-height: 20px;
+}
+
+.file input {
+	position: absolute;
+	font-size: 100px;
+	right: 0;
+	top: 0;
+	opacity: 0;
+}
+
+.file img {
+	float: left;
+	margin-left: 5%;
+}
+
+.file :hover {
+	text-decoration: none;
+}
+
+#uploadPic {
+	
+}
+
+.row {
+	padding-top: 5px;
+}
+#displayPicDiv {
+	border-radius:5px;
+}
+
+.piclist {
+	max-heigt:100px;
+	max-width:120px;
+	border-radius:5px;
+	margin : 5px;
+	/* width:expression(this.width > 300 ? "300px" : this.width);
+	height:e­xpression(this.height>100?"100px":this.height); */
+}
+.bigPicList {
+	
+	max-width:120px;
+	max-heigt:100px;
+	border-radius:5px;
+	margin : 5px;
+}
+#smallPicList {
+	text-align: center;
+}
+.smallPicList {
+	
+	max-width:30px;
+	max-heigt:30px;
+	border-radius:2px;
+	margin : 3px;
+	display: inline;
+}
+#picListContainer{
+	height: 230px;
+    width: 700px;   
+    border: 1px solid green;
+    overflow: hidden;
+	
+}
+#picList {
+	white-space:nowrap;
+	width: 100%;
+    height: 95%;
+    border: 1px solid blue;
+    overflow: hidden;
+    padding-right: 15px;
+    padding-bottom: 35px;
+}
+#bigPic {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 100;
+  display: table-cell;
+  display: none;
+  max-width: 100%;
+  max-height: 100%;
+  
+  vertical-align: middle;
+  text-align: center;
+  
+}
+#bigPicShow img{
+	
+	margin: 0 auto;
+	margin-top: 50px;
+	max-width: 600px;
+    max-height: 600px;
+    overflow: auto;
+    padding: 10px;
+    border-radius:5px;
+}
+#left , #right {
+	height:100%;
+	width:6%;
+	float:left; 
+ 	 
+ 	 
+	/* padding-top:80px;
+	padding-left: 5px;
+	padding-right: 5px; */
+}
+#left img, #right img {
+	 
+}
+</style>
+<link rel="stylesheet" type="text/css"
+	href="../statics/css/bootstrap.css">
+ 
+	
+<script src="../statics/js/jquery.js"></script>
+<script src="../statics/js/util.js"></script>
+<script src="../statics/js/bootstrap.js"></script>
+ 
+</head>
+<body>
+
+	<div class="container">
+		<div class="col-md-3"> </div>
+		<div class="col-md-6"  >
+		<div id="loginUser" style="float:left; padding-top:9px;" ></div>
+		<div id="isLogin" style="float: right; padding-top:9px;"></div>
+		</div>		 
+		<div class="col-md-3"></div>
+	</div>
+
+	 
+
+
+</body>
+<script type="text/javascript">
+
+ 
+	
+                  
+</script>
+</html>

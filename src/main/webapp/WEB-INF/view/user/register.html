@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>注册新</title>
+
+    <link rel="stylesheet" href="../statics/css/bootstrap.css"/>
+    <link rel="stylesheet" href="../statics/css/bootstrapValidator.css"/>
+
+    <script type="text/javascript" src="../statics/js/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="../statics/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../statics/js/bootstrapValidator.js"></script>
+    <script src="../statics/js/util.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+            <div id="loginUser" style="float:left; padding-top:9px;" ></div>
+            <div id="isLogin" style="float: right"></div>
+                <div class="page-header " style="text-align:center;">
+                    <h2>注册</h2>
+                </div>
+
+                <form id="defaultForm" method="post" class="form-horizontal" action="/user/doRegister">
+                     
+
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">用户名</label>
+                        <div class="col-lg-5">
+                            <input type="text" class="form-control" id="username" name="username" />
+                        </div>
+                    </div>
+
+
+                     
+
+
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">密码</label>
+                        <div class="col-lg-5">
+                            <input type="password" class="form-control" name="password" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">确认密码</label>
+                        <div class="col-lg-5">
+                            <input type="password" class="form-control" name="confirmPassword" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">性别</label>
+                        <div class="col-lg-5">
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="sex" value="M" /> 男
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="sex" value="F" /> 女
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="sex" value="O" /> 其他
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">年龄</label>
+                        <div class="col-lg-3">
+                            <input type="text" class="form-control" name="age" />
+                        </div>
+                    </div>
+ 
+
+                    <div class="form-group">
+                        <label class="col-lg-4 control-label">信息</label>
+                        <div class="col-lg-5">
+                            <input type="text" class="form-control" name="info" />
+                        </div>
+                    </div>
+
+                    
+
+                     
+
+                    <div class="form-group">
+                        <div class="col-lg-9 col-lg-offset-4">
+                            <button type="submit"   class="btn btn-primary" name="signup" value="Sign up">注册</button>
+                         	<button   class="btn btn-primary"  onclick="backWelcome()" >返回</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+
+function doRegister() {
+	var username = document.getElementById("username").value;
+	var password = document.getElementById("password").value;
+	var info = document.getElementById("info").value;
+	var age = document.getElementById("age").value;
+	var rootpath = getRootPath();
+	var URL = rootpath + "/user/doRegister";
+
+	$.ajax({
+		"type" : "POST",
+		"url" : URL,
+		"dataType" : "json",
+		"data" : {
+			"username" : username,
+			"password" : password,
+			"age" : age,
+			"info" : info
+
+		},
+
+		"success" : function(resp) {
+			console.log(resp);
+			if ("yes" == resp.registerSuccess) {
+				window.location.href = rootpath + "/user/customer";
+			} else {
+				alert("注册失败！");
+			}
+
+		},
+		"error" : function(e) {
+			alert("注册失败");
+		}
+	});
+}
+
+function backWelcome() {
+	var rootpath = getRootPath();
+	window.location.href = rootpath ;
+}
+
+$(document).ready(function() {
+	var rootpath = getRootPath();
+	var url = rootpath + "/user/isExistUser";
+    $('#defaultForm').bootstrapValidator({
+        message: 'This value is not valid',
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            
+            username: {
+                message: '无效的用户名',
+                threshold: 4,
+                validators: {
+                    notEmpty: {
+                        message: '用户名不能为空'
+                    },
+                    stringLength: {
+                        min: 4,
+                        max: 20
+                    },
+                    regexp: {
+                        regexp: /^[a-zA-Z0-9_\.]+$/,
+                        message : '请输入4-64位以小写字母开头，小写字母或数字结尾，字母、数字或-组成的'
+                    },
+                    remote: {//ajax验证。server result:{"valid",true or false} 
+                        url: url,
+                        message: '用户已存在',
+                        delay: 3000,
+                        type: 'POST',
+                        //自定义参数
+                        data: {
+                        	username: $('#username').val(),
+                            "apptype": 1
+                              }
+                       
+                         
+                    } 
+                }
+            },
+            password: {
+                validators: {
+                    notEmpty: {}
+                     
+                }
+            } 
+            
+           
+            
+            
+        }
+    }).on('success.form.bv', function(e) {//点击提交之后
+        // Prevent form submission
+        e.preventDefault();
+
+        // Get the form instance
+        var $form = $(e.target);
+
+        // Get the BootstrapValidator instance
+        var bv = $form.data('bootstrapValidator');
+        
+        var rootpath = getRootPath();
+    	var url = rootpath + "/user/doRegister";
+        
+        // Use Ajax to submit form data 提交至form标签中的action，result自定义
+        $.post(url, $form.serialize(), function(result) {
+				//do something...
+				result = eval("(" + result + ")");
+				if ("yes" == result.registerSuccess) {
+					window.location.href = rootpath + "/user/customer";
+				} else {
+					alert("注册失败！");
+				}
+		});
+    });
+});
+</script>
+</body>
+</html>

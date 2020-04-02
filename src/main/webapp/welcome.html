@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>登录界面</title>
+
+    <link rel="stylesheet" href="statics/css/bootstrap.css"/>
+    <link rel="stylesheet" href="statics/css/bootstrapValidator.css"/>
+
+    <script type="text/javascript" src="statics/js/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="statics/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="statics/js/bootstrapValidator.js"></script>
+    <script src="statics/js/util.js"></script>
+</head>
+<body>
+    <div class="container">	
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+            <div id="isLogin" style="float: right"></div>
+                <div class="page-header  " style="text-align:center;">
+                    <h2>登录</h2>
+                </div>
+
+                <form id="defaultForm" method="post" class="form-horizontal" action="/user/doRegister.do">
+                     
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">用户名</label>
+                        <div class="col-lg-5">
+                            <input type="text" class="form-control" id="username" name="username" />
+                        </div>
+                    </div>
+
+
+                     
+
+
+                    <div class="form-group">
+                        <label class="col-lg-3 control-label">密码</label>
+                        <div class="col-lg-5">
+                            <input type="password" class="form-control" id="password" name="password" />
+                        </div>
+                    </div>
+
+                     
+                    <div class="form-group">
+                        <div class="col-lg-9 col-lg-offset-3">
+                            <button type="submit"   class="btn btn-primary" name="login" value="login">登录</button>
+                        	<button type="button" id="register" class="btn btn-primary">注册</button>
+                        	<button type="button" id="faceRegister" class="btn btn-primary">人脸注册</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+
+function doRegister() {
+	var username = document.getElementById("username").value;
+	var password = document.getElementById("password").value;
+	var info = document.getElementById("info").value;
+	var age = document.getElementById("age").value;
+	var rootpath = getRootPath();
+	var URL = rootpath + "/user/doRegister.do";
+
+	$.ajax({
+		"type" : "POST",
+		"url" : URL,
+		"dataType" : "json",
+		"data" : {
+			"username" : username,
+			"password" : password,
+			"age" : age,
+			"info" : info
+
+		},
+
+		"success" : function(resp) {
+			console.log(resp);
+			if ("yes" == resp.registerSuccess) {
+				window.location.href = rootpath + "/user/customer.do?username=" + resp;
+			} else {
+				alert("注册失败！");
+			}
+
+		},
+		"error" : function(e) {
+			alert("注册失败");
+		}
+	});
+}
+
+function backWelcome() {
+	var rootpath = getRootPath();
+	window.location.href = rootpath ;
+}
+
+$(document).ready(function() {
+	var rootpath = getRootPath();
+	var url = rootpath + "/user/isExistUser.do";
+    $('#defaultForm').bootstrapValidator({
+        message: '无效的用户名',
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            
+            username: {
+                message: '无效的用户名',
+                threshold: 4,
+                validators: {
+                    notEmpty: {
+                        message: '用户名不能为空'
+                    } 
+                }
+            } 
+            
+        }
+    }).on('success.form.bv', function(e) {//点击提交之后
+        // Prevent form submission
+        e.preventDefault();
+
+        // Get the form instance
+        var $form = $(e.target);
+
+        // Get the BootstrapValidator instance
+        var bv = $form.data('bootstrapValidator');
+        
+        var rootpath = getRootPath();
+    	var url = rootpath + "/user/doLogin.do";
+        
+        // Use Ajax to submit form data 提交至form标签中的action，result自定义
+        $.post(url, $form.serialize(), function(result) {
+				//do something...
+				result = eval("(" + result + ")");
+				if(result.user == 'notExist') {
+					 
+					$("input[name='password']").parent().addClass("has-error");
+					$("input[name='password']").parent().append('<small  id="wrongIdOrPassword" data-bv-validator="notEmpty" data-bv-validator-for="password" class="help-block">用户名或密码错误</small>');
+				} else if(result.user == 'alreadyExist'){
+					var r=confirm("用户已在别处登录，是否继续登录！");
+					
+					if(r == true) {   /////确认再次登录
+						var username = document.getElementById("username").value;
+						var password = document.getElementById("password").value;
+						 $.ajax({
+								type: "POST",
+								url: url,
+						    	data: {
+						    		username : username,
+						    		password : password,
+						    		confirmLogin : 'confirmLogin' 
+						    	},
+						    	 
+								dataType:'json',
+								success: function(data){
+									 
+									window.location.href = rootpath + "/user/customer.do";
+									 
+								}
+							});
+						
+					} else {   ////不再登录了
+						
+						
+					}
+					
+				} else {
+					console.log(result);
+					window.location.href = rootpath + "/user/customer.do?username=" + result.user.username;
+
+				}
+				
+				 
+		});
+    });
+});
+
+$("input[name='password']").parent().mousedown(event, function() {
+	$("input[name='password']").parent().removeClass("has-error");
+	$("input[name='password']").parent();
+	$("small[class='help-block']").empty();
+	$("input[class='password']").parent().removeClass("help-block");
+	$("button[name='login']").removeAttr("disabled");
+});
+
+$("#register").click(function() {
+	window.location.href = rootPath + "/user/register.do";
+	
+})
+ 
+ $("#faceRegister").click(function() {
+	window.location.href = rootPath + "/user/faceRegister.do";
+		
+})
+
+</script>
+</body>
+</html>

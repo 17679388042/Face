@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>人脸注册</title>
+
+<link rel="stylesheet" href="../statics/css/bootstrap.css" />
+<link rel="stylesheet" href="../statics/css/bootstrapValidator.css" />
+
+<script type="text/javascript" src="../statics/js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../statics/js/bootstrap.min.js"></script>
+<script src="../statics/js/util.js"></script>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8 col-lg-offset-2">
+				<div id="loginUser" style="float: left; padding-top: 9px;"></div>
+				<div id="isLogin" style="float: right"></div>
+				<div class="page-header  " style="text-align: center;">
+					<h2>注册</h2>
+				</div>
+				<button type="button" id="controlVideo" class="btn btn-default">打开摄像头</button>
+				<button type="button" id="takePhoto" onclick="takePhoto()"
+					class="btn btn-default">拍照</button>
+				<form id="registerForm">
+					<!-- 获取头像 -->
+					<div class="col-md-6">
+						<video id="myVideo"
+							style="border: 1px solid black; border-radius: 5px; margin-top: 18px;"
+							width="350" height="260"></video>
+
+						<!-- <button type="button" id="takePhoto" class="btn btn-default">拍照</button> -->
+
+						<canvas width="350" height="260" id="photo"
+							style="border: none; display: none"></canvas>
+						<!-- 获取头像 -->
+
+						<div style="width: 200px; height: 150px; border: 1px solid grey;"
+							id="faceImage"></div>
+
+
+
+
+					</div>
+					<div class="col-md-6">
+						<div class="form-group" style="margin-bottom: 40px;">
+							<label class="col-lg-3">用户名</label>
+							<div class="col-lg-7">
+								<input type="text" class="form-control" id="username"
+									name="username" />
+							</div>
+						</div>
+
+
+
+
+
+						<div class="form-group">
+							<label class="col-lg-3  " style="margin-bottom: 40px;">密码</label>
+							<div class="col-lg-7">
+								<input type="password" id="password" class="form-control"
+									name="password" />
+							</div>
+						</div>
+
+
+						<label class="col-lg-3 "></label>
+						<div class="col-lg-7">
+							<button type="button" class="btn btn-primary"
+								onclick="doFaceRegister();">注册</button>
+							<button type="button" class="btn btn-primary"
+								onclick="backWelcome()">返回</button>
+						</div>
+					</div>
+
+
+				</form>
+			</div>
+
+
+
+
+		</div>
+	</div>
+	<script src="../statics/js/pic.js"></script>
+	<script type="text/javascript">
+		function getRootPath() {
+			// 获取当前网址，如： http://localhost:8088/test/test.jsp
+			var curPath = window.document.location.href;
+			// 获取主机地址之后的目录，如： test/test.jsp
+			var pathName = window.document.location.pathname;
+			var pos = curPath.indexOf(pathName);
+			// 获取主机地址，如： http://localhost:8088
+			var localhostPath = curPath.substring(0, pos);
+			// 获取带"/"的项目名，如：/test
+			var projectName = pathName.substring(0, pathName.substr(1).indexOf(
+					'/') + 1);
+			return (localhostPath + projectName);// 发布前用此
+		}
+		window.rootpath = getRootPath();
+		$(document).ready(function() {
+			var rootpath = getRootPath();
+			///查看是否可以使用相机
+			hasNavigator();
+		});
+
+		function backWelcome() {
+			var rootpath = getRootPath();
+			window.location.href = rootpath;
+		}
+
+		function doFaceRegister() {
+			var username = document.getElementById("username").value;
+			var password = document.getElementById("password").value;
+
+			//var URL = rootpath + "/user/doFaceRegister.do";
+
+			var registerData = {};
+			registerData['username'] = username;
+			registerData['password'] = password;
+			registerData['photoData'] = photo_data;
+
+			console.log(registerData);
+
+			var rootpath = getRootPath();
+			var faceRegisterUrl = rootpath + "/user/doFaceRegister";
+
+			$.ajax({
+				"type" : "POST",
+				"url" : faceRegisterUrl,
+				"dataType" : "json",
+				"data" : registerData,
+				"connectiontimeout" : 2000,
+				"success" : function(resp) {
+					console.log(resp);
+					if ("yes" == resp.registerSuccess) {
+						window.location.href = rootpath + "/user/customer";
+					} else {
+						alert("注册失败！");
+					}
+				},
+				"error" : function(e) {
+					console.log("文件上传失败。。");
+					console.log(e);
+				}
+			});
+
+		}
+		////////////获取摄像流数据		
+		var localMediaStream = "";
+		///////////视频聊天窗口
+		var videoDiv = document.getElementById('myVideo');
+		/////////////摄像机开启成功时执行该函数
+		function onSuccess(stream) {
+			localMediaStream = stream;
+			videoDiv.srcObject = stream;
+			// 在这里是拿不到video的宽高的
+			// console.log(video.videoWidth + " " + video.videoHeight);
+			videoDiv.play();
+		}
+		//////////////摄像机开启失败时执行该函数
+		function onError() {
+			console.log("获取摄像头出现问题了。。。");
+		}
+
+		// 打开摄像头
+		$("#controlVideo").click(function() {
+			if (localMediaStream == "") {
+
+				navigator.getUserMedia({
+					video : true,
+					audio : false
+				}, onSuccess, onError);
+				document.getElementById("controlVideo").innerText = "关闭摄像头";
+
+			} else {
+				//document.getElementById("faceImage").innerHTML = "";
+				localMediaStream.getVideoTracks()[0].stop();
+				localMediaStream = "";
+				document.getElementById("controlVideo").innerText = "打开摄像头";
+
+			}
+
+		})
+		photo_data = "";
+		// ///获取拍照的canvas
+		var takePhotoCanvas = document.getElementById('photo');
+		// 拍照
+		function takePhoto() {
+			document.getElementById("faceImage").innerHTML = "";
+			var photoWidth = videoDiv.videoWidth;
+			var photoHeight = videoDiv.videoHeight;
+			var width_height = photoWidth / photoHeight;
+			var pic_width = 200;
+			var pic_height = pic_width / width_height;
+			document.getElementById("photo").width = pic_width;
+			document.getElementById("photo").height = pic_height;
+			var video_src = videoDiv;
+
+			takePhotoCanvas.getContext("2d").drawImage(videoDiv, 0, 0,
+					pic_width, pic_height);
+
+			photo_data = takePhotoCanvas.toDataURL("image/png");
+			///将图像数据传往后台，用于登录
+			console.log("aaaa")
+
+			var photo_img = document.createElement("img");
+
+			photo_img.src = photo_data;
+
+			var deliveryInfoDiv = document.getElementById("faceImage");
+			deliveryInfoDiv.appendChild(photo_img);
+
+		};
+
+		function hasNavigator() {
+			////要获取摄像头，首先必须要有navigator对象，界面打开的时候就要初始化
+			navigator.getUserMedia
+					|| (navigator.getUserMedia = navigator.mozGetUserMedia
+							|| navigator.webkitGetUserMedia
+							|| navigator.msGetUserMedia);
+			if (navigator.getUserMedia) {
+				//do something
+			} else {
+				console.log('your browser not support getUserMedia');
+			}
+
+		}
+
+		function doLogin() {
+			var faceUrl = $("#facePic")[0].src;
+			checkFace(faceUrl);
+
+		}
+
+		function checkFace(src) {
+			var image = new Image();
+			image.crossOrigin = '*';
+			image.src = src;
+			if (src) {
+				image.onload = function() {
+
+					uploadFace(getBase64(image, 150, 200));
+				}
+			}
+		}
+		function uploadFace(faceImage) {
+			var rootpath = getRootPath();
+			var faceLoginUrl = rootpath + "/user/loginByFace";
+			$.ajax({
+				"type" : "POST",
+				"url" : faceLoginUrl,
+				"dataType" : "json",
+				"data" : {
+					"faceImage" : faceImage,
+					"userName" : "pcchen",
+				},
+
+				"connectiontimeout" : 1000,
+				"success" : function(resp) {
+					//loginJudge(resp);
+					console.log(resp);
+				},
+				"error" : function(e) {
+					console.log("文件上传失败。。");
+					console.log(e);
+				}
+			});
+		}
+
+		function getBase64(img, width, height) {
+			var canvas = document.createElement("canvas");
+			canvas.width = width ? width : img.width;
+			canvas.height = height ? height : img.height;
+			var ctx = canvas.getContext("2d");
+			ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+			var dataURL = canvas.toDataURL();
+			return dataURL;
+		}
+	</script>
+</body>
+</html>

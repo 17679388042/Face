@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pchen.mapper.PicMapper">
+	<insert id="addPic" parameterType="pic" >
+		 <!-- 注意。。#{}这个里面的参数，大小写敏感的。。。，需要跟对象里的值对应 -->
+		insert into picinfo (username, picpath, uploadtime) values (#{username}, #{picPath}, #{uploadtime});
+	</insert>
+	
+	
+	<select id="getPic"  parameterType="String"   resultType="String" >
+		 
+			insert into user (username, password, age, info) values (#{username}, #{password}, #{age}, #{info})
+		 	
+	</select>
+	 
+	
+	<select id="getPicsByUser" parameterType="String" resultType="pic">
+		select picpath , uploadtime from picinfo where username = #{username};
+	</select>
+</mapper>
